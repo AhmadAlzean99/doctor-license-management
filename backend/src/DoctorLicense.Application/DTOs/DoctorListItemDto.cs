@@ -1,0 +1,21 @@
+using DoctorLicense.Domain.Enums;
+
+namespace DoctorLicense.Application.DTOs;
+
+public class DoctorListItemDto
+{
+    public int Id { get; set; }
+    public string FullName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Specialization { get; set; } = string.Empty;
+    public string LicenseNumber { get; set; } = string.Empty;
+
+    public DateOnly LicenseExpiryDate { get; set; }
+
+    public DoctorStatus Status { get; set; }
+
+    public DateTime CreatedDate { get; set; }
+    public DateTime? ModifiedDate { get; set; }
+
+    public int TotalCount { get; set; }
+}
