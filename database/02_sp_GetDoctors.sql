@@ -69,11 +69,13 @@ BEGIN
             d.Specialization,
             d.LicenseNumber,
             d.LicenseExpiryDate,
-            CASE
-                WHEN d.Status = 3                       THEN 3   -- Suspended
-                WHEN d.LicenseExpiryDate < @Today       THEN 2   -- Expired
-                ELSE                                          1  -- Active
-            END                                         AS Status,
+            CAST(
+                CASE
+                    WHEN d.Status = 3                   THEN 3   -- Suspended
+                    WHEN d.LicenseExpiryDate < @Today   THEN 2   -- Expired
+                    ELSE                                      1  -- Active
+                END
+            AS TINYINT)                                 AS Status,
             d.CreatedDate,
             d.ModifiedDate
         FROM dbo.Doctors AS d
