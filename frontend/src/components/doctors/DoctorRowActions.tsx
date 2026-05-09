@@ -1,10 +1,10 @@
 'use client';
 
 import { Edit2, Trash2 } from 'lucide-react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { EditDoctorModal } from '@/components/doctors/EditDoctorModal';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { doctorsApi, HttpError } from '@/lib/api';
@@ -18,6 +18,7 @@ export function DoctorRowActions({ doctor }: DoctorRowActionsProps) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   async function handleDelete() {
     setIsDeleting(true);
@@ -37,14 +38,15 @@ export function DoctorRowActions({ doctor }: DoctorRowActionsProps) {
   return (
     <>
       <div className="flex items-center justify-end gap-1">
-        <Link
-          href={`/doctors/${doctor.id}/edit`}
+        <button
+          type="button"
+          onClick={() => setShowEditModal(true)}
           className="rounded-md p-1.5 text-stone-500 transition-colors hover:bg-teal-50 hover:text-teal-600"
           title="Edit"
           aria-label={`Edit ${doctor.fullName}`}
         >
           <Edit2 className="h-4 w-4" />
-        </Link>
+        </button>
         <button
           type="button"
           onClick={() => setShowDeleteModal(true)}
@@ -55,6 +57,12 @@ export function DoctorRowActions({ doctor }: DoctorRowActionsProps) {
           <Trash2 className="h-4 w-4" />
         </button>
       </div>
+
+      <EditDoctorModal
+        open={showEditModal}
+        doctorId={doctor.id}
+        onClose={() => setShowEditModal(false)}
+      />
 
       <Modal
         open={showDeleteModal}

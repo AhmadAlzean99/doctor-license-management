@@ -20,9 +20,11 @@ import {
 interface DoctorFormProps {
   mode: 'create' | 'edit';
   initial?: DoctorDetails;
+  onSuccess?: () => void;
+  onCancel?: () => void;
 }
 
-export function DoctorForm({ mode, initial }: DoctorFormProps) {
+export function DoctorForm({ mode, initial, onSuccess, onCancel }: DoctorFormProps) {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
   const isEdit = mode === 'edit';
@@ -61,8 +63,12 @@ export function DoctorForm({ mode, initial }: DoctorFormProps) {
         await doctorsApi.create(values as CreateDoctorFormValues);
         toast.success(`${values.fullName} added`);
       }
-      router.push('/doctors');
       router.refresh();
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        router.push('/doctors');
+      }
     } catch (e) {
       if (e instanceof HttpError) {
         if (e.body.errors) {
@@ -75,6 +81,11 @@ export function DoctorForm({ mode, initial }: DoctorFormProps) {
         setServerError('Something went wrong. Please try again.');
       }
     }
+  }
+
+  function handleCancel() {
+    if (onCancel) onCancel();
+    else router.back();
   }
 
   return (
@@ -137,7 +148,7 @@ export function DoctorForm({ mode, initial }: DoctorFormProps) {
       </div>
 
       <div className="flex justify-end gap-2 pt-2">
-        <Button type="button" variant="secondary" onClick={() => router.back()}>
+        <Button type="button" variant="secondary" onClick={handleCancel}>
           Cancel
         </Button>
         <Button type="submit" loading={isSubmitting}>

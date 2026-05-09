@@ -56,14 +56,14 @@ export function TopProgressBar() {
     if (intervalRef.current) clearInterval(intervalRef.current);
 
     const elapsed = performance.now() - startedAtRef.current;
-    const remaining = Math.max(400 - elapsed, 0);
+    const remaining = Math.max(700 - elapsed, 0);
 
     minDurationRef.current = setTimeout(() => {
       setProgress(100);
       completeTimeoutRef.current = setTimeout(() => {
         setVisible(false);
         setProgress(0);
-      }, 200);
+      }, 300);
     }, remaining);
 
     return () => {
@@ -74,12 +74,12 @@ export function TopProgressBar() {
   if (!visible) return null;
 
   return (
-    <div className="fixed left-0 right-0 top-0 z-[60] h-0.5 overflow-hidden bg-transparent">
+    <div className="pointer-events-none fixed left-0 right-0 top-0 z-[60] h-1 overflow-hidden bg-transparent">
       <div
-        className="h-full bg-gradient-to-r from-teal-500 to-emerald-500 transition-all duration-200 ease-out"
+        className="h-full bg-gradient-to-r from-teal-400 via-teal-500 to-emerald-500 transition-all duration-200 ease-out"
         style={{
           width: `${progress}%`,
-          boxShadow: '0 0 10px rgba(20, 184, 166, 0.8)',
+          boxShadow: '0 0 14px 1px rgba(20, 184, 166, 0.9), 0 0 4px rgba(16, 185, 129, 0.7)',
         }}
       />
     </div>
