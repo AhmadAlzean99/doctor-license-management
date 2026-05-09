@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { ActiveFilters } from '@/components/doctors/ActiveFilters';
 import { DashboardHero, DashboardHeroSkeleton } from '@/components/doctors/DashboardHero';
 import { DoctorTable, DoctorTableSkeleton } from '@/components/doctors/DoctorTable';
 import { SearchBar } from '@/components/doctors/SearchBar';
@@ -37,11 +38,16 @@ export default async function DoctorsPage({ searchParams }: PageProps) {
         <StatusDistribution />
       </Suspense>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="sm:max-w-xs sm:flex-1">
-          <SearchBar />
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="sm:max-w-xs sm:flex-1">
+            <SearchBar />
+          </div>
+          <StatusFilter />
         </div>
-        <StatusFilter />
+        <Suspense fallback={null}>
+          <ActiveFilters />
+        </Suspense>
       </div>
 
       <Suspense key={tableKey} fallback={<DoctorTableSkeleton />}>
