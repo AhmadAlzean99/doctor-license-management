@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 export function Header() {
   return (
     <header className="sticky top-0 z-30 border-b border-stone-200/70 bg-white/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-6">
+      <div className="mx-auto flex h-16 max-w-screen-2xl items-center justify-between gap-4 px-8">
         <Link
           href="/doctors"
           className="flex items-center gap-2.5 transition-opacity hover:opacity-80"

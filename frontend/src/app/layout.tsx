@@ -28,7 +28,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
         <Header />
-        <main className="mx-auto max-w-6xl px-6 py-8">{children}</main>
+        <main className="mx-auto max-w-screen-2xl px-8 py-8">{children}</main>
         <Toaster position="top-right" richColors closeButton />
       </body>
     </html>

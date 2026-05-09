@@ -1,4 +1,5 @@
 import { AlertTriangle } from 'lucide-react';
+import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { DoctorRowActions } from '@/components/doctors/DoctorRowActions';
@@ -86,8 +87,13 @@ export async function DoctorTable({ query }: DoctorTableProps) {
                   className={`transition-colors hover:bg-stone-50 ${isExpired ? 'bg-rose-50/30' : ''}`}
                 >
                   <td className="px-5 py-4">
-                    <div className="font-medium text-stone-900">{d.fullName}</div>
-                    <div className="text-xs text-stone-500">{d.email}</div>
+                    <div className="flex items-center gap-3">
+                      <Avatar name={d.fullName} />
+                      <div className="min-w-0">
+                        <div className="truncate font-medium text-stone-900">{d.fullName}</div>
+                        <div className="truncate text-xs text-stone-500">{d.email}</div>
+                      </div>
+                    </div>
                   </td>
                   <td className="px-5 py-4 text-sm text-stone-700">{d.specialization}</td>
                   <td className="px-5 py-4 font-mono text-sm text-stone-700">{d.licenseNumber}</td>

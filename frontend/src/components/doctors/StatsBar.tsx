@@ -1,6 +1,7 @@
 import { Activity, AlertTriangle, ShieldOff, Users } from 'lucide-react';
 import { ReactNode } from 'react';
 import { Card } from '@/components/ui/Card';
+import { CountUp } from '@/components/ui/CountUp';
 import { doctorsApi } from '@/lib/api';
 import { DoctorStatus } from '@/lib/types';
 
@@ -21,7 +22,9 @@ function Stat({ label, hint, value, icon, iconGradient, delayClass }: StatProps)
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-stone-700">{label}</p>
-          <p className="mt-2 text-3xl font-semibold tracking-tight text-stone-900">{value}</p>
+          <p className="mt-2 text-3xl font-semibold tracking-tight text-stone-900">
+            <CountUp value={value} />
+          </p>
           <p className="mt-1 text-xs text-stone-500">{hint}</p>
         </div>
         <div
