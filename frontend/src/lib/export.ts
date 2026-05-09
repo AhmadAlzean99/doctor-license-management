@@ -1,5 +1,6 @@
 import {
   AlignmentType,
+  BorderStyle,
   Document,
   Footer,
   HeadingLevel,
@@ -17,7 +18,9 @@ import { doctorsApi } from '@/lib/api';
 import { type DoctorListItem, type GetDoctorsQuery, statusLabel } from '@/lib/types';
 
 const EXPORT_PAGE_SIZE = 100;
-const TEAL_FILL = '0F766E';
+const HEADER_FILL = 'CCFBF1';
+const HEADER_TEXT = '0F766E';
+const ROW_BORDER = 'E5E7EB';
 
 function formatDate(isoDate: string): string {
   return new Date(isoDate).toLocaleDateString('en-GB', {
@@ -101,12 +104,21 @@ export function exportToCsv(doctors: DoctorListItem[], filenameDate: string) {
   downloadBlob(blob, `doctors-${filenameDate}.csv`);
 }
 
+const cellBorders = {
+  top: { style: BorderStyle.SINGLE, size: 4, color: ROW_BORDER },
+  bottom: { style: BorderStyle.SINGLE, size: 4, color: ROW_BORDER },
+  left: { style: BorderStyle.SINGLE, size: 4, color: ROW_BORDER },
+  right: { style: BorderStyle.SINGLE, size: 4, color: ROW_BORDER },
+};
+
 function headerCell(text: string): TableCell {
   return new TableCell({
-    shading: { fill: TEAL_FILL, type: ShadingType.CLEAR, color: 'auto' },
+    shading: { fill: HEADER_FILL, type: ShadingType.CLEAR, color: 'auto' },
+    borders: cellBorders,
+    margins: { top: 100, bottom: 100, left: 120, right: 120 },
     children: [
       new Paragraph({
-        children: [new TextRun({ text, bold: true, color: 'FFFFFF', size: 22 })],
+        children: [new TextRun({ text, bold: true, color: HEADER_TEXT, size: 22 })],
       }),
     ],
   });
@@ -114,9 +126,12 @@ function headerCell(text: string): TableCell {
 
 function dataCell(text: string): TableCell {
   return new TableCell({
+    shading: { fill: 'FFFFFF', type: ShadingType.CLEAR, color: 'auto' },
+    borders: cellBorders,
+    margins: { top: 80, bottom: 80, left: 120, right: 120 },
     children: [
       new Paragraph({
-        children: [new TextRun({ text, size: 20 })],
+        children: [new TextRun({ text, size: 20, color: '1F2937' })],
       }),
     ],
   });
