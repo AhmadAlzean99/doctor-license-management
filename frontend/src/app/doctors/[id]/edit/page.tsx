@@ -2,6 +2,7 @@ import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { DoctorForm } from '@/components/doctors/DoctorForm';
+import { DoctorStatusCard } from '@/components/doctors/DoctorStatusCard';
 import { Card } from '@/components/ui/Card';
 import { doctorsApi, HttpError } from '@/lib/api';
 
@@ -37,9 +38,21 @@ export default async function EditDoctorPage({ params }: PageProps) {
         <p className="text-sm text-slate-600">Update {doctor.fullName}&apos;s information.</p>
       </div>
 
-      <Card className="mx-auto w-full max-w-2xl p-6">
-        <DoctorForm mode="edit" initial={doctor} />
-      </Card>
+      <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
+        <Card className="p-6">
+          <DoctorForm mode="edit" initial={doctor} />
+        </Card>
+
+        <Card className="p-6">
+          <h2 className="mb-4 text-base font-semibold text-slate-900">Status</h2>
+          <DoctorStatusCard
+            doctorId={doctor.id}
+            doctorName={doctor.fullName}
+            storedStatus={doctor.storedStatus}
+            effectiveStatus={doctor.effectiveStatus}
+          />
+        </Card>
+      </div>
     </div>
   );
 }
