@@ -49,7 +49,7 @@ export async function DoctorTable({ query }: DoctorTableProps) {
   }
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="animate-fade-in-up overflow-hidden [animation-delay:300ms]">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="border-b border-stone-200 bg-stone-50/60">

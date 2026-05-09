@@ -34,7 +34,7 @@ export async function StatusDistribution() {
   const pct = (n: number) => (n / total) * 100;
 
   return (
-    <Card className="p-5">
+    <Card className="animate-fade-in-up p-5 [animation-delay:240ms]">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-sm font-semibold text-stone-900">License distribution</h3>
         <span className="text-xs text-stone-500">{total} total</span>

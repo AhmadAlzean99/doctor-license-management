@@ -25,7 +25,7 @@ export async function DashboardHero() {
   const expiredCount = expired.totalCount;
 
   return (
-    <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-teal-50/70 via-white to-white p-6 shadow-sm ring-1 ring-stone-200/70">
+    <div className="relative animate-fade-in-up overflow-hidden rounded-xl bg-gradient-to-br from-teal-50/70 via-white to-white p-6 shadow-sm ring-1 ring-stone-200/70">
       <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-teal-200/30 blur-3xl" />
 
       <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">

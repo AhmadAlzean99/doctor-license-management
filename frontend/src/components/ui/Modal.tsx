@@ -46,11 +46,11 @@ export function Modal({ open, onClose, title, size = 'md', children, footer }: M
       aria-modal="true"
     >
       <div
-        className="absolute inset-0 bg-stone-900/60 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 animate-fade-in bg-stone-900/60 backdrop-blur-sm"
         onClick={onClose}
       />
       <div
-        className={`relative w-full rounded-xl bg-white shadow-2xl ring-1 ring-stone-200 ${sizeClasses[size]}`}
+        className={`relative w-full animate-modal-in rounded-xl bg-white shadow-2xl ring-1 ring-stone-200 ${sizeClasses[size]}`}
       >
         {title && (
           <div className="flex items-center justify-between border-b border-stone-100 px-5 py-4">
