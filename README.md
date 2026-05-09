@@ -15,6 +15,8 @@ A medical SaaS module for managing doctor license records — built with **.NET 
 - [Stored Procedures](#stored-procedures)
 - [API Reference](#api-reference)
 - [Frontend](#frontend)
+- [Role-Based UI](#role-based-ui)
+- [Export](#export)
 - [Validation Strategy](#validation-strategy)
 - [Decisions and Trade-offs](#decisions-and-trade-offs)
 - [What I Would Add Next](#what-i-would-add-next)
@@ -34,16 +36,26 @@ This module lets clinics and medical platforms manage their doctors' license rec
 - Server-side pagination
 - Bonus listing of expired licenses with days-overdue calculation
 
+**All four bonuses from the brief:**
+- Pagination — server-driven via `COUNT(*) OVER()` in the SP, single round trip
+- Modal view — Add, Edit, Delete confirmation, and Quick View all as modals
+- Expired highlight — pink row tint plus an amber "Expires in N days" warning
+- Role-based UI — Admin / Editor / Viewer with a mock role switcher
+
 **Product polish on top of the brief:**
 - Dashboard with key-metrics stats and a status-distribution chart
 - Greeting hero with contextual insight ("X licenses need renewal")
 - Add and Edit flows in modal popups so the table stays in context
 - Inline status update via the dedicated PATCH endpoint
+- Quick view modal — click any doctor's name to see full details without leaving the dashboard
+- CSV and Word (.docx) export with formatted templates and active-filter context
+- Active filter chips with one-click removal and "Clear all"
 - Custom SVG empty state, status badges with colored dots, initials avatars
 - Animated number count-up, top progress bar, modal entrance transitions
 - Toast notifications for every mutation
 - "Expires in N days" warning badges on active doctors with imminent expiry
 - Loading skeletons for every route segment
+- Keyboard shortcuts — `/` focuses search, `N` opens Add Doctor
 - `prefers-reduced-motion` support for accessibility
 
 ---
@@ -53,7 +65,7 @@ This module lets clinics and medical platforms manage their doctors' license rec
 | Layer        | Technology                                                                |
 | ------------ | ------------------------------------------------------------------------- |
 | **Frontend** | Next.js 14 (App Router) · TypeScript · Tailwind CSS                       |
-|              | react-hook-form · zod · sonner (toasts) · lucide-react (icons)            |
+|              | react-hook-form · zod · sonner (toasts) · lucide-react (icons) · docx (Word export) |
 | **Backend**  | .NET 8 Web API · Clean Architecture · FluentValidation · Serilog          |
 | **Database** | SQL Server · Stored Procedures · EF Core 8 · Microsoft.Data.SqlClient     |
 | **Tooling**  | Swagger / OpenAPI · GitHub                                                |
@@ -315,6 +327,51 @@ Next.js 14 App Router with Tailwind. The dashboard at `/doctors` is the single p
 
 ---
 
+## Role-Based UI
+
+Implemented as a **client-side mock** — three roles with three permission profiles, switchable via a dropdown in the header. The active role persists in `localStorage`.
+
+| Role       | Create | Edit | Delete | Change Status |
+| ---------- | :----: | :--: | :----: | :-----------: |
+| **Admin**  |   ✅   |  ✅  |   ✅   |      ✅       |
+| **Editor** |   ✅   |  ✅  |   ❌   |      ❌       |
+| **Viewer** |   ❌   |  ❌  |   ❌   |      ❌       |
+
+The architecture mirrors what real authentication would use:
+
+- `lib/role.ts` — role types and the permission matrix (server-safe pure code)
+- `RoleProvider` — React Context with `localStorage` hydration, exposes the `useRole` and `usePermissions` hooks
+- `RoleSwitcher` — the dropdown in the header (this is the mock; in production it would be a user menu showing the JWT claims)
+- Components consume `usePermissions()` and conditionally render — `Header` hides the **Add Doctor** button for Viewer, `DoctorRow` hides the edit/delete icons per permission, `EditDoctorModal` hides the Administrative status section unless the role can change status
+
+**In production**, the same `usePermissions()` hook would read the role from a JWT claim instead of `localStorage`, and the backend would also enforce the rules with `[Authorize(Roles = "Admin")]` attributes on the relevant endpoints. Only the source of the role changes — every call site stays identical.
+
+The mock is clearly labeled in the dropdown footer: *"Mock role switch — production would use a JWT claim."*
+
+---
+
+## Export
+
+Both formats download the **currently filtered** doctor list — search and status filters are respected.
+
+**CSV** (Excel-compatible)
+- Pure-browser `Blob` generation, no server round trip
+- UTF-8 BOM so Excel renders unicode names (Arabic, Chinese, etc.) correctly
+- RFC 4180-compliant escaping for fields containing commas, quotes, or newlines
+- Eight columns: Id, Full Name, Email, Specialization, License Number, License Expiry Date, Status (label), Created Date
+- Filename pattern: `doctors-YYYY-MM-DD.csv`
+
+**Word** (.docx, formatted report)
+- Generated client-side with the [docx](https://docx.js.org) library, which is **dynamically imported** so the dashboard's first-paint bundle stays small
+- Heading 1 title, italic generated date, applied-filter description, record count
+- Styled table with light-teal header row + bold dark-teal text + light-gray cell borders
+- Footer with "Page X of Y"
+- Filename pattern: `doctors-YYYY-MM-DD.docx`
+
+The exporter loops the listing API page-by-page (respecting the SP's `pageSize` cap of 100), collects every matching row, and only then triggers the download — so the export reflects the full filtered set, not just what's visible on screen.
+
+---
+
 ## Validation Strategy
 
 Three layers of defense, each catching what the previous one misses:
@@ -351,6 +408,12 @@ Storing filter state in the URL makes the view bookmarkable and refresh-safe, an
 
 ### Why three exception types in Domain?
 Each one maps to a distinct HTTP status code through the global middleware: `NotFoundException → 404`, `ConflictException → 409`, `DomainException → 400`. The middleware does the translation; the service throws semantic exceptions without knowing about HTTP.
+
+### Why a mock role switcher instead of full auth?
+Authentication and user management are explicitly out of scope for a license-management module assignment — adding them would mean less time on the actual brief. A client-side mock with `localStorage` persistence demonstrates **the same UI patterns** that real auth uses: the same `usePermissions()` hook, the same conditional rendering, the same permission matrix. In production, only the source of the role changes (from `localStorage` to a JWT claim) and the backend would also enforce it via `[Authorize]` attributes. The mock is labeled clearly in the UI so it's never mistaken for real security.
+
+### Why a client-side export instead of a backend endpoint?
+For 10–1000 doctors, generating the file in the browser is fast, free, and avoids a server round trip. The browser already has the data via the listing API. A backend endpoint would shine for **large datasets** (50k+ rows), background generation, or audit trails — none of which apply at this scale. The `docx` library is dynamically imported so the export code only loads when the user clicks Export.
 
 ### Why Sonner instead of a homemade toast?
 Three reasons: it's tiny (~1 KB), it has accessible defaults (focus management, ARIA roles), and it ships an animated entry/exit out of the box. Building those correctly takes longer than the integration.
