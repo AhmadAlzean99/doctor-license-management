@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
+import { Suspense } from 'react';
 import { Toaster } from 'sonner';
 import { Header } from '@/components/layout/Header';
+import { TopProgressBar } from '@/components/ui/TopProgressBar';
 import './globals.css';
 
 const geistSans = localFont({
@@ -27,6 +29,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
+        <Suspense fallback={null}>
+          <TopProgressBar />
+        </Suspense>
         <Header />
         <main className="mx-auto max-w-screen-2xl px-8 py-8">{children}</main>
         <Toaster position="top-right" richColors closeButton />
