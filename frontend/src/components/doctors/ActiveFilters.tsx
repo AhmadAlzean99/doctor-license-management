@@ -21,11 +21,11 @@ export function ActiveFilters() {
     const next = new URLSearchParams(params.toString());
     next.delete(key);
     next.delete('pageNumber');
-    startTransition(() => router.push(`${pathname}?${next.toString()}`));
+    startTransition(() => router.push(`${pathname}?${next.toString()}`, { scroll: false }));
   }
 
   function clearAll() {
-    startTransition(() => router.push(pathname));
+    startTransition(() => router.push(pathname, { scroll: false }));
   }
 
   return (

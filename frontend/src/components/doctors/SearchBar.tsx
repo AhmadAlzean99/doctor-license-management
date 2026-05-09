@@ -23,7 +23,7 @@ export function SearchBar() {
     if (value) next.set('search', value);
     else next.delete('search');
     next.delete('pageNumber');
-    startTransition(() => router.push(`${pathname}?${next.toString()}`));
+    startTransition(() => router.push(`${pathname}?${next.toString()}`, { scroll: false }));
   }
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {

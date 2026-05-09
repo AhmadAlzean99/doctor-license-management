@@ -16,7 +16,7 @@ export function StatusFilter() {
     if (e.target.value) next.set('status', e.target.value);
     else next.delete('status');
     next.delete('pageNumber');
-    startTransition(() => router.push(`${pathname}?${next.toString()}`));
+    startTransition(() => router.push(`${pathname}?${next.toString()}`, { scroll: false }));
   }
 
   return (
