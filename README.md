@@ -7,6 +7,7 @@ A medical SaaS module for managing doctor license records — built with **.NET 
 ## Table of Contents
 
 - [Overview](#overview)
+- [Screenshots](#screenshots)
 - [Tech Stack](#tech-stack)
 - [Architecture](#architecture)
 - [Project Structure](#project-structure)
@@ -57,6 +58,52 @@ This module lets clinics and medical platforms manage their doctors' license rec
 - Loading skeletons for every route segment
 - Keyboard shortcuts — `/` focuses search, `N` opens Add Doctor
 - `prefers-reduced-motion` support for accessibility
+
+---
+
+## Screenshots
+
+### Dashboard
+
+The main view at `/doctors` — branded header with the custom shield+check logo, contextual greeting hero, four stat cards with gradient icon tiles and animated count-up, license distribution chart with segment cards, search and status filter, and the doctor table with initials avatars, status badges, and "Expires in N days" warnings.
+
+![Dashboard with hero, stats, distribution chart, and doctor table](docs/screenshots/01-dashboard.png)
+
+### Add Doctor (Modal)
+
+Clicking "+ Add Doctor" opens a modal in place — the table stays visible behind a dimmed backdrop so the admin keeps context. Form fields are validated client-side via Zod with messages that mirror the backend's FluentValidation rules.
+
+![Add doctor modal opens over the dashboard with the form ready to fill](docs/screenshots/02-add-modal.png)
+
+### Edit + Status Update
+
+The edit modal carries two cohesive sections: the doctor's editable fields on top and a dedicated "Administrative status" card below. The status section uses the dedicated PATCH /api/doctors/{id}/status endpoint and shows both the stored intent and the effective (computed) status.
+
+![Edit modal showing the form plus the Administrative status section](docs/screenshots/03-edit-modal.png)
+
+### Quick View
+
+Clicking a doctor's name opens a read-only quick view — full record at a glance with formatted audit timestamps. From here the reviewer can hand off to the edit modal without losing context.
+
+![Quick view modal showing full doctor details with avatar and audit info](docs/screenshots/04-quick-view.png)
+
+### Role-Based UI
+
+The role switcher in the header swaps between Admin, Editor, and Viewer. The choice persists in localStorage and the entire UI reacts: actions appear and disappear based on the active role's permissions. Mock today, JWT-claim-driven in production — same `usePermissions()` call sites either way.
+
+![Role switcher dropdown showing Admin, Editor, Viewer options](docs/screenshots/05-role-switcher.png)
+
+### Export
+
+CSV and Word (.docx) export, both generated client-side. The exporter loops the listing API to collect the full filtered set, not just the visible page. Word output uses a styled template — heading, italic generated date, applied-filter description, formatted table with light-teal header, and a page-number footer.
+
+![Export menu with CSV and Word format options](docs/screenshots/06-export-menu.png)
+
+### Expired Licenses View
+
+Filtering by Status surfaces an active filter chip with one-click removal plus a "Clear all" link. Expired rows get a soft pink tint and a rose-dot status badge so the urgent records jump out at a glance.
+
+![Filtered view showing expired doctors with active filter chip and pink row tint](docs/screenshots/07-expired-filter.png)
 
 ---
 
