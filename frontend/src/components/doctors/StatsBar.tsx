@@ -8,20 +8,19 @@ interface StatProps {
   label: string;
   value: number;
   icon: ReactNode;
-  iconBg: string;
-  iconColor: string;
+  iconGradient: string;
 }
 
-function Stat({ label, value, icon, iconBg, iconColor }: StatProps) {
+function Stat({ label, value, icon, iconGradient }: StatProps) {
   return (
-    <Card className="p-5">
+    <Card className="p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-medium text-slate-500">{label}</p>
-          <p className="mt-1 text-3xl font-semibold tracking-tight text-slate-900">{value}</p>
+          <p className="text-sm font-medium text-stone-500">{label}</p>
+          <p className="mt-1 text-3xl font-semibold tracking-tight text-stone-900">{value}</p>
         </div>
         <div
-          className={`flex h-11 w-11 items-center justify-center rounded-lg ${iconBg} ${iconColor}`}
+          className={`flex h-11 w-11 items-center justify-center rounded-lg bg-gradient-to-br text-white shadow-sm ${iconGradient}`}
         >
           {icon}
         </div>
@@ -44,29 +43,25 @@ export async function StatsBar() {
         label="Total Doctors"
         value={total.totalCount}
         icon={<Users className="h-5 w-5" />}
-        iconBg="bg-blue-50"
-        iconColor="text-blue-600"
+        iconGradient="from-teal-500 to-emerald-600 shadow-teal-600/20"
       />
       <Stat
         label="Active"
         value={active.totalCount}
         icon={<Activity className="h-5 w-5" />}
-        iconBg="bg-emerald-50"
-        iconColor="text-emerald-600"
+        iconGradient="from-emerald-500 to-emerald-600 shadow-emerald-600/20"
       />
       <Stat
         label="Expired"
         value={expired.totalCount}
         icon={<AlertTriangle className="h-5 w-5" />}
-        iconBg="bg-rose-50"
-        iconColor="text-rose-600"
+        iconGradient="from-rose-500 to-rose-600 shadow-rose-600/20"
       />
       <Stat
         label="Suspended"
         value={suspended.totalCount}
         icon={<ShieldOff className="h-5 w-5" />}
-        iconBg="bg-amber-50"
-        iconColor="text-amber-600"
+        iconGradient="from-amber-500 to-orange-600 shadow-amber-600/20"
       />
     </div>
   );
@@ -79,10 +74,10 @@ export function StatsBarSkeleton() {
         <Card key={i} className="p-5">
           <div className="flex items-center justify-between gap-3">
             <div className="flex flex-col gap-2">
-              <div className="h-4 w-24 animate-pulse rounded bg-slate-200" />
-              <div className="h-8 w-12 animate-pulse rounded bg-slate-200" />
+              <div className="h-4 w-24 animate-pulse rounded bg-stone-200" />
+              <div className="h-8 w-12 animate-pulse rounded bg-stone-200" />
             </div>
-            <div className="h-11 w-11 animate-pulse rounded-lg bg-slate-200" />
+            <div className="h-11 w-11 animate-pulse rounded-lg bg-stone-200" />
           </div>
         </Card>
       ))}

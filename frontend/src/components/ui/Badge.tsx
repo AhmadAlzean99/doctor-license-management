@@ -13,7 +13,7 @@ const toneClasses: Record<BadgeTone, string> = {
   expired: 'bg-rose-50 text-rose-700 ring-rose-200',
   suspended: 'bg-amber-50 text-amber-700 ring-amber-200',
   warning: 'bg-amber-50 text-amber-700 ring-amber-200',
-  neutral: 'bg-slate-50 text-slate-700 ring-slate-200',
+  neutral: 'bg-stone-50 text-stone-700 ring-stone-200',
 };
 
 export function Badge({ tone, children, className }: BadgeProps) {

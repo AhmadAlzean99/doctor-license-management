@@ -27,11 +27,11 @@ export function Pagination({ currentPage, totalPages, totalCount, pageSize }: Pa
   const safeTotal = Math.max(totalPages, 1);
 
   return (
-    <div className="flex flex-col items-center justify-between gap-3 border-t border-slate-200 px-5 py-3 sm:flex-row">
-      <p className="text-sm text-slate-600">
-        Showing <span className="font-medium text-slate-900">{start}</span>–
-        <span className="font-medium text-slate-900">{end}</span> of{' '}
-        <span className="font-medium text-slate-900">{totalCount}</span>
+    <div className="flex flex-col items-center justify-between gap-3 border-t border-stone-200 px-5 py-3 sm:flex-row">
+      <p className="text-sm text-stone-600">
+        Showing <span className="font-medium text-stone-900">{start}</span>–
+        <span className="font-medium text-stone-900">{end}</span> of{' '}
+        <span className="font-medium text-stone-900">{totalCount}</span>
       </p>
       <div className="flex items-center gap-2">
         <Button
@@ -43,9 +43,9 @@ export function Pagination({ currentPage, totalPages, totalCount, pageSize }: Pa
           <ChevronLeft className="h-4 w-4" />
           Previous
         </Button>
-        <span className="text-sm text-slate-600">
-          Page <span className="font-medium text-slate-900">{currentPage}</span> of{' '}
-          <span className="font-medium text-slate-900">{safeTotal}</span>
+        <span className="text-sm text-stone-600">
+          Page <span className="font-medium text-stone-900">{currentPage}</span> of{' '}
+          <span className="font-medium text-stone-900">{safeTotal}</span>
         </span>
         <Button
           variant="secondary"

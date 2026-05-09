@@ -6,7 +6,7 @@ export function Skeleton({ className }: SkeletonProps) {
   return (
     <div
       className={[
-        'animate-pulse rounded-md bg-slate-200',
+        'animate-pulse rounded-md bg-stone-200',
         className ?? '',
       ].join(' ')}
     />

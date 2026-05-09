@@ -47,10 +47,10 @@ export function DoctorStatusCard({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3 text-sm">
-        <span className="text-slate-600">Currently shown as</span>
+        <span className="text-stone-600">Currently shown as</span>
         <StatusBadge status={effectiveStatus} />
         {showsDifferentEffective && (
-          <span className="text-xs text-slate-500">
+          <span className="text-xs text-stone-500">
             (stored as {statusLabel[storedStatus]} — auto-computed from license expiry)
           </span>
         )}

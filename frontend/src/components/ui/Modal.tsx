@@ -33,17 +33,17 @@ export function Modal({ open, onClose, title, children, footer }: ModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
       <div
-        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-stone-900/60 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
-      <div className="relative w-full max-w-md rounded-xl bg-white shadow-2xl ring-1 ring-slate-200">
+      <div className="relative w-full max-w-md rounded-xl bg-white shadow-2xl ring-1 ring-stone-200">
         {title && (
-          <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-            <h2 className="text-base font-semibold text-slate-900">{title}</h2>
+          <div className="flex items-center justify-between border-b border-stone-100 px-5 py-4">
+            <h2 className="text-base font-semibold text-stone-900">{title}</h2>
             <button
               type="button"
               onClick={onClose}
-              className="rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+              className="rounded-md p-1 text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-600"
               aria-label="Close"
             >
               <X className="h-5 w-5" />
@@ -51,7 +51,7 @@ export function Modal({ open, onClose, title, children, footer }: ModalProps) {
           </div>
         )}
         <div className="px-5 py-4">{children}</div>
-        {footer && <div className="flex justify-end gap-2 border-t border-slate-100 px-5 py-3">{footer}</div>}
+        {footer && <div className="flex justify-end gap-2 border-t border-stone-100 px-5 py-3">{footer}</div>}
       </div>
     </div>
   );

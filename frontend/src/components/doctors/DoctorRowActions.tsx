@@ -39,7 +39,7 @@ export function DoctorRowActions({ doctor }: DoctorRowActionsProps) {
       <div className="flex items-center justify-end gap-1">
         <Link
           href={`/doctors/${doctor.id}/edit`}
-          className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-100 hover:text-blue-600"
+          className="rounded-md p-1.5 text-stone-500 transition-colors hover:bg-teal-50 hover:text-teal-600"
           title="Edit"
           aria-label={`Edit ${doctor.fullName}`}
         >
@@ -48,7 +48,7 @@ export function DoctorRowActions({ doctor }: DoctorRowActionsProps) {
         <button
           type="button"
           onClick={() => setShowDeleteModal(true)}
-          className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-rose-50 hover:text-rose-600"
+          className="rounded-md p-1.5 text-stone-500 transition-colors hover:bg-rose-50 hover:text-rose-600"
           title="Delete"
           aria-label={`Delete ${doctor.fullName}`}
         >
@@ -71,9 +71,9 @@ export function DoctorRowActions({ doctor }: DoctorRowActionsProps) {
           </>
         }
       >
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-stone-600">
           Are you sure you want to delete{' '}
-          <span className="font-semibold text-slate-900">{doctor.fullName}</span>? The record
+          <span className="font-semibold text-stone-900">{doctor.fullName}</span>? The record
           will be soft-deleted and can be restored later from the database.
         </p>
       </Modal>

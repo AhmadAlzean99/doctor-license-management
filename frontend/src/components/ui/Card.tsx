@@ -9,7 +9,7 @@ export function Card({ children, className }: CardProps) {
   return (
     <div
       className={[
-        'rounded-xl bg-white shadow-sm ring-1 ring-slate-200',
+        'rounded-xl bg-white shadow-sm ring-1 ring-stone-200/70',
         className ?? '',
       ].join(' ')}
     >

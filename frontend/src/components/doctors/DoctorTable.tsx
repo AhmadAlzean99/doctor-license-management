@@ -36,11 +36,11 @@ export async function DoctorTable({ query }: DoctorTableProps) {
     return (
       <Card className="p-12">
         <div className="flex flex-col items-center justify-center text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
-            <FileText className="h-6 w-6 text-slate-400" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-stone-100">
+            <FileText className="h-6 w-6 text-stone-400" />
           </div>
-          <h3 className="mt-4 text-base font-semibold text-slate-900">No doctors found</h3>
-          <p className="mt-1 max-w-sm text-sm text-slate-500">
+          <h3 className="mt-4 text-base font-semibold text-stone-900">No doctors found</h3>
+          <p className="mt-1 max-w-sm text-sm text-stone-500">
             Try adjusting your search or filters, or add a new doctor to get started.
           </p>
         </div>
@@ -52,29 +52,29 @@ export async function DoctorTable({ query }: DoctorTableProps) {
     <Card className="overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="border-b border-slate-200 bg-slate-50">
+          <thead className="border-b border-stone-200 bg-stone-50/60">
             <tr>
-              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-stone-600">
                 Doctor
               </th>
-              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-stone-600">
                 Specialization
               </th>
-              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-stone-600">
                 License
               </th>
-              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-stone-600">
                 Expiry
               </th>
-              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-stone-600">
                 Status
               </th>
-              <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-600">
+              <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wider text-stone-600">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-stone-100">
             {result.items.map((d) => {
               const isExpired = d.status === DoctorStatus.Expired;
               const days = daysUntil(d.licenseExpiryDate);
@@ -84,15 +84,15 @@ export async function DoctorTable({ query }: DoctorTableProps) {
               return (
                 <tr
                   key={d.id}
-                  className={`transition-colors hover:bg-slate-50 ${isExpired ? 'bg-rose-50/30' : ''}`}
+                  className={`transition-colors hover:bg-stone-50 ${isExpired ? 'bg-rose-50/30' : ''}`}
                 >
                   <td className="px-5 py-4">
-                    <div className="font-medium text-slate-900">{d.fullName}</div>
-                    <div className="text-xs text-slate-500">{d.email}</div>
+                    <div className="font-medium text-stone-900">{d.fullName}</div>
+                    <div className="text-xs text-stone-500">{d.email}</div>
                   </td>
-                  <td className="px-5 py-4 text-sm text-slate-700">{d.specialization}</td>
-                  <td className="px-5 py-4 font-mono text-sm text-slate-700">{d.licenseNumber}</td>
-                  <td className="px-5 py-4 text-sm text-slate-700">
+                  <td className="px-5 py-4 text-sm text-stone-700">{d.specialization}</td>
+                  <td className="px-5 py-4 font-mono text-sm text-stone-700">{d.licenseNumber}</td>
+                  <td className="px-5 py-4 text-sm text-stone-700">
                     <div className="flex flex-col gap-1">
                       <span>{formatDate(d.licenseExpiryDate)}</span>
                       {expiringSoon && (
@@ -131,7 +131,7 @@ export function DoctorTableSkeleton() {
       <div className="space-y-3 p-5">
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="flex items-center gap-4">
-            <div className="h-12 flex-1 animate-pulse rounded bg-slate-100" />
+            <div className="h-12 flex-1 animate-pulse rounded bg-stone-100" />
           </div>
         ))}
       </div>
