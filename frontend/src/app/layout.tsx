@@ -3,6 +3,7 @@ import localFont from 'next/font/local';
 import { Suspense } from 'react';
 import { Toaster } from 'sonner';
 import { Header } from '@/components/layout/Header';
+import { RoleProvider } from '@/components/RoleProvider';
 import { KeyboardShortcuts } from '@/components/ui/KeyboardShortcuts';
 import { TopProgressBar } from '@/components/ui/TopProgressBar';
 import './globals.css';
@@ -30,13 +31,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
-        <Suspense fallback={null}>
-          <TopProgressBar />
-        </Suspense>
-        <KeyboardShortcuts />
-        <Header />
-        <main className="mx-auto max-w-screen-2xl px-8 py-8">{children}</main>
-        <Toaster position="top-right" richColors closeButton />
+        <RoleProvider>
+          <Suspense fallback={null}>
+            <TopProgressBar />
+          </Suspense>
+          <KeyboardShortcuts />
+          <Header />
+          <main className="mx-auto max-w-screen-2xl px-8 py-8">{children}</main>
+          <Toaster position="top-right" richColors closeButton />
+        </RoleProvider>
       </body>
     </html>
   );

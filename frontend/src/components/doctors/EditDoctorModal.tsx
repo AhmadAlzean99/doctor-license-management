@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { DoctorForm } from '@/components/doctors/DoctorForm';
 import { DoctorStatusCard } from '@/components/doctors/DoctorStatusCard';
+import { usePermissions } from '@/components/RoleProvider';
 import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { doctorsApi, HttpError } from '@/lib/api';
@@ -16,6 +17,7 @@ interface EditDoctorModalProps {
 }
 
 export function EditDoctorModal({ open, doctorId, onClose }: EditDoctorModalProps) {
+  const permissions = usePermissions();
   const [doctor, setDoctor] = useState<DoctorDetails | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -55,15 +57,17 @@ export function EditDoctorModal({ open, doctorId, onClose }: EditDoctorModalProp
         <div className="flex flex-col gap-6">
           <DoctorForm mode="edit" initial={doctor} onSuccess={onClose} onCancel={onClose} />
 
-          <div className="border-t border-stone-100 pt-5">
-            <h3 className="mb-4 text-sm font-semibold text-stone-900">Administrative status</h3>
-            <DoctorStatusCard
-              doctorId={doctor.id}
-              doctorName={doctor.fullName}
-              storedStatus={doctor.storedStatus}
-              effectiveStatus={doctor.effectiveStatus}
-            />
-          </div>
+          {permissions.canChangeStatus && (
+            <div className="border-t border-stone-100 pt-5">
+              <h3 className="mb-4 text-sm font-semibold text-stone-900">Administrative status</h3>
+              <DoctorStatusCard
+                doctorId={doctor.id}
+                doctorName={doctor.fullName}
+                storedStatus={doctor.storedStatus}
+                effectiveStatus={doctor.effectiveStatus}
+              />
+            </div>
+          )}
         </div>
       )}
     </Modal>

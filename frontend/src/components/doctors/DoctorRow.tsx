@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { DoctorQuickView } from '@/components/doctors/DoctorQuickView';
 import { EditDoctorModal } from '@/components/doctors/EditDoctorModal';
 import { StatusBadge } from '@/components/doctors/StatusBadge';
+import { usePermissions } from '@/components/RoleProvider';
 import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -38,6 +39,7 @@ function daysUntil(isoDate: string): number {
 
 export function DoctorRow({ doctor }: DoctorRowProps) {
   const router = useRouter();
+  const permissions = usePermissions();
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -103,24 +105,31 @@ export function DoctorRow({ doctor }: DoctorRowProps) {
         </td>
         <td className="px-5 py-4 text-right">
           <div className="flex items-center justify-end gap-1">
-            <button
-              type="button"
-              onClick={() => setEditOpen(true)}
-              className="rounded-md p-1.5 text-stone-500 transition-colors hover:bg-teal-50 hover:text-teal-600"
-              title="Edit"
-              aria-label={`Edit ${doctor.fullName}`}
-            >
-              <Edit2 className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setDeleteOpen(true)}
-              className="rounded-md p-1.5 text-stone-500 transition-colors hover:bg-rose-50 hover:text-rose-600"
-              title="Delete"
-              aria-label={`Delete ${doctor.fullName}`}
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
+            {permissions.canEdit && (
+              <button
+                type="button"
+                onClick={() => setEditOpen(true)}
+                className="rounded-md p-1.5 text-stone-500 transition-colors hover:bg-teal-50 hover:text-teal-600"
+                title="Edit"
+                aria-label={`Edit ${doctor.fullName}`}
+              >
+                <Edit2 className="h-4 w-4" />
+              </button>
+            )}
+            {permissions.canDelete && (
+              <button
+                type="button"
+                onClick={() => setDeleteOpen(true)}
+                className="rounded-md p-1.5 text-stone-500 transition-colors hover:bg-rose-50 hover:text-rose-600"
+                title="Delete"
+                aria-label={`Delete ${doctor.fullName}`}
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            )}
+            {!permissions.canEdit && !permissions.canDelete && (
+              <span className="text-xs text-stone-400">View only</span>
+            )}
           </div>
         </td>
       </tr>

@@ -4,6 +4,7 @@ import { Calendar, Mail, Stethoscope, FileText } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { StatusBadge } from '@/components/doctors/StatusBadge';
+import { usePermissions } from '@/components/RoleProvider';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
@@ -37,6 +38,7 @@ function formatDateTime(iso: string) {
 }
 
 export function DoctorQuickView({ open, doctorId, onClose, onEdit }: DoctorQuickViewProps) {
+  const permissions = usePermissions();
   const [doctor, setDoctor] = useState<DoctorDetails | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -80,7 +82,7 @@ export function DoctorQuickView({ open, doctorId, onClose, onEdit }: DoctorQuick
             <Button variant="secondary" onClick={onClose}>
               Close
             </Button>
-            <Button onClick={onEdit}>Edit doctor</Button>
+            {permissions.canEdit && <Button onClick={onEdit}>Edit doctor</Button>}
           </>
         )
       }
