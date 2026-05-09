@@ -1,6 +1,6 @@
-import Link from 'next/link';
-import { Edit2, FileText } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
+import { DoctorRowActions } from '@/components/doctors/DoctorRowActions';
 import { Pagination } from '@/components/doctors/Pagination';
 import { StatusBadge } from '@/components/doctors/StatusBadge';
 import { doctorsApi } from '@/lib/api';
@@ -82,13 +82,7 @@ export async function DoctorTable({ query }: DoctorTableProps) {
                     <StatusBadge status={d.status} />
                   </td>
                   <td className="px-5 py-4 text-right">
-                    <Link
-                      href={`/doctors/${d.id}/edit`}
-                      className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-50"
-                    >
-                      <Edit2 className="h-3.5 w-3.5" />
-                      Edit
-                    </Link>
+                    <DoctorRowActions doctor={d} />
                   </td>
                 </tr>
               );
