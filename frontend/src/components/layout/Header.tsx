@@ -2,12 +2,16 @@
 
 import { Plus, Stethoscope } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { AddDoctorModal } from '@/components/doctors/AddDoctorModal';
 import { Button } from '@/components/ui/Button';
+import { useOpenAddDoctorListener } from '@/components/ui/KeyboardShortcuts';
 
 export function Header() {
   const [addOpen, setAddOpen] = useState(false);
+
+  const openAdd = useCallback(() => setAddOpen(true), []);
+  useOpenAddDoctorListener(openAdd);
 
   return (
     <>
@@ -26,10 +30,15 @@ export function Header() {
             </span>
           </Link>
 
-          <Button onClick={() => setAddOpen(true)}>
-            <Plus className="h-4 w-4" />
-            Add Doctor
-          </Button>
+          <div className="flex items-center gap-3">
+            <kbd className="hidden items-center gap-1 rounded-md border border-stone-200 bg-stone-50 px-2 py-1 font-mono text-[10px] font-medium text-stone-500 lg:inline-flex">
+              Press <span className="rounded bg-white px-1 ring-1 ring-stone-200">N</span> to add
+            </kbd>
+            <Button onClick={() => setAddOpen(true)}>
+              <Plus className="h-4 w-4" />
+              Add Doctor
+            </Button>
+          </div>
         </div>
       </header>
 

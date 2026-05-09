@@ -3,6 +3,7 @@ import localFont from 'next/font/local';
 import { Suspense } from 'react';
 import { Toaster } from 'sonner';
 import { Header } from '@/components/layout/Header';
+import { KeyboardShortcuts } from '@/components/ui/KeyboardShortcuts';
 import { TopProgressBar } from '@/components/ui/TopProgressBar';
 import './globals.css';
 
@@ -32,6 +33,7 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <TopProgressBar />
         </Suspense>
+        <KeyboardShortcuts />
         <Header />
         <main className="mx-auto max-w-screen-2xl px-8 py-8">{children}</main>
         <Toaster position="top-right" richColors closeButton />
