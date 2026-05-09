@@ -1,7 +1,9 @@
 import { Suspense } from 'react';
+import { DashboardHero, DashboardHeroSkeleton } from '@/components/doctors/DashboardHero';
 import { DoctorTable, DoctorTableSkeleton } from '@/components/doctors/DoctorTable';
 import { SearchBar } from '@/components/doctors/SearchBar';
 import { StatsBar, StatsBarSkeleton } from '@/components/doctors/StatsBar';
+import { StatusDistribution, StatusDistributionSkeleton } from '@/components/doctors/StatusDistribution';
 import { StatusFilter } from '@/components/doctors/StatusFilter';
 import { DoctorStatus, type GetDoctorsQuery } from '@/lib/types';
 
@@ -23,15 +25,16 @@ export default async function DoctorsPage({ searchParams }: PageProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight text-stone-900">Doctors</h1>
-        <p className="text-sm text-stone-600">
-          Manage doctor licenses, statuses, and renewals across the platform.
-        </p>
-      </header>
+      <Suspense fallback={<DashboardHeroSkeleton />}>
+        <DashboardHero />
+      </Suspense>
 
       <Suspense fallback={<StatsBarSkeleton />}>
         <StatsBar />
+      </Suspense>
+
+      <Suspense fallback={<StatusDistributionSkeleton />}>
+        <StatusDistribution />
       </Suspense>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
