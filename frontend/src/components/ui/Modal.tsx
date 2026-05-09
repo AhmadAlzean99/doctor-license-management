@@ -1,6 +1,7 @@
 'use client';
 
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
 type ModalSize = 'md' | 'lg' | 'xl';
@@ -21,6 +22,12 @@ const sizeClasses: Record<ModalSize, string> = {
 };
 
 export function Modal({ open, onClose, title, size = 'md', children, footer }: ModalProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     if (!open) return;
 
@@ -37,11 +44,11 @@ export function Modal({ open, onClose, title, size = 'md', children, footer }: M
     };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 sm:items-center sm:p-6"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
     >
@@ -50,7 +57,7 @@ export function Modal({ open, onClose, title, size = 'md', children, footer }: M
         onClick={onClose}
       />
       <div
-        className={`relative w-full animate-modal-in rounded-xl bg-white shadow-2xl ring-1 ring-stone-200 ${sizeClasses[size]}`}
+        className={`relative flex max-h-[90vh] w-full animate-modal-in flex-col overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-stone-200 ${sizeClasses[size]}`}
       >
         {title && (
           <div className="flex items-center justify-between border-b border-stone-100 px-5 py-4">
@@ -65,11 +72,12 @@ export function Modal({ open, onClose, title, size = 'md', children, footer }: M
             </button>
           </div>
         )}
-        <div className="px-5 py-5">{children}</div>
+        <div className="flex-1 overflow-y-auto px-5 py-5">{children}</div>
         {footer && (
           <div className="flex justify-end gap-2 border-t border-stone-100 px-5 py-3">{footer}</div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
