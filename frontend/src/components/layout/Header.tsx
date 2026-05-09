@@ -1,6 +1,6 @@
 'use client';
 
-import { Plus, Stethoscope } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useState } from 'react';
 import { AddDoctorModal } from '@/components/doctors/AddDoctorModal';
@@ -8,6 +8,7 @@ import { RoleSwitcher } from '@/components/layout/RoleSwitcher';
 import { usePermissions } from '@/components/RoleProvider';
 import { Button } from '@/components/ui/Button';
 import { useOpenAddDoctorListener } from '@/components/ui/KeyboardShortcuts';
+import { LogoMark } from '@/components/ui/LogoMark';
 
 export function Header() {
   const [addOpen, setAddOpen] = useState(false);
@@ -25,14 +26,14 @@ export function Header() {
         <div className="mx-auto flex h-16 max-w-screen-2xl items-center justify-between gap-4 px-8">
           <Link
             href="/doctors"
-            className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
+            className="flex items-center gap-3 transition-opacity hover:opacity-85"
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-teal-500 to-emerald-600 text-white shadow-sm shadow-teal-600/20">
-              <Stethoscope className="h-5 w-5" />
-            </span>
+            <LogoMark className="h-10 w-10 drop-shadow-sm transition-transform hover:rotate-3" />
             <span className="flex flex-col leading-tight">
-              <span className="text-sm font-semibold tracking-tight text-stone-900">DocLicense</span>
-              <span className="text-xs text-stone-500">License Management</span>
+              <span className="text-base font-semibold tracking-tight text-stone-900">DocLicense</span>
+              <span className="text-[11px] font-medium uppercase tracking-wider text-teal-700/80">
+                License Management
+              </span>
             </span>
           </Link>
 
