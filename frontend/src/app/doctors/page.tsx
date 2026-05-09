@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { ActiveFilters } from '@/components/doctors/ActiveFilters';
 import { DashboardHero, DashboardHeroSkeleton } from '@/components/doctors/DashboardHero';
 import { DoctorTable, DoctorTableSkeleton } from '@/components/doctors/DoctorTable';
+import { ExportMenu } from '@/components/doctors/ExportMenu';
 import { SearchBar } from '@/components/doctors/SearchBar';
 import { StatsBar, StatsBarSkeleton } from '@/components/doctors/StatsBar';
 import { StatusDistribution, StatusDistributionSkeleton } from '@/components/doctors/StatusDistribution';
@@ -43,7 +44,10 @@ export default async function DoctorsPage({ searchParams }: PageProps) {
           <div className="sm:max-w-xs sm:flex-1">
             <SearchBar />
           </div>
-          <StatusFilter />
+          <div className="flex items-center gap-2">
+            <StatusFilter />
+            <ExportMenu />
+          </div>
         </div>
         <Suspense fallback={null}>
           <ActiveFilters />
