@@ -1,121 +1,379 @@
 # Doctor License Management
 
-A medical SaaS module for managing doctor licenses — built with **.NET 8**, **Next.js 14**, and **SQL Server**.
-
-> Technical assignment for the Full Stack Developer role at **Carlisle**.
+A medical SaaS module for managing doctor license records — built with **.NET 8**, **Next.js 14**, and **SQL Server** for the Carlisle Full Stack technical assignment.
 
 ---
 
-## 🧭 Table of Contents
+## Table of Contents
 
-- [Overview](#-overview)
-- [Tech Stack](#-tech-stack)
-- [Architecture](#-architecture)
-- [Project Structure](#-project-structure)
-- [Quick Start](#-quick-start)
-- [Database](#-database)
-- [Stored Procedures](#-stored-procedures)
-- [API Reference](#-api-reference)
-- [Validation Strategy](#-validation-strategy)
-- [Decisions & Trade-offs](#-decisions--trade-offs)
-
----
-
-## 📋 Overview
-
-This module lets clinics and medical platforms manage their doctors' license records:
-
-- ✅ Full CRUD with soft delete
-- ✅ Auto-mark licenses as **Expired** when expiry date passes
-- ✅ Prevent duplicate license numbers
-- ✅ Search by name or license number
-- ✅ Filter by status (Active / Expired / Suspended)
-- ✅ Server-side pagination
+- [Overview](#overview)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Project Structure](#project-structure)
+- [Quick Start](#quick-start)
+- [Database](#database)
+- [Stored Procedures](#stored-procedures)
+- [API Reference](#api-reference)
+- [Frontend](#frontend)
+- [Validation Strategy](#validation-strategy)
+- [Decisions and Trade-offs](#decisions-and-trade-offs)
+- [What I Would Add Next](#what-i-would-add-next)
 
 ---
 
-## 🛠 Tech Stack
+## Overview
 
-| Layer        | Technology                                                |
-| ------------ | --------------------------------------------------------- |
-| **Frontend** | Next.js 14 (App Router) · TypeScript · Tailwind CSS       |
-| **Backend**  | .NET 8 Web API · Clean Architecture · FluentValidation    |
-| **Database** | SQL Server · Stored Procedures                            |
-| **Tooling**  | Swagger · xUnit · Serilog                                 |
+This module lets clinics and medical platforms manage their doctors' license records.
+
+**Functional features:**
+- Create, list, view, update, delete (soft) doctors
+- Search by name or license number
+- Filter by status (Active / Expired / Suspended)
+- Auto-mark licenses as **Expired** when expiry date passes — without anyone updating the row
+- Prevent duplicate license numbers across active records
+- Server-side pagination
+- Bonus listing of expired licenses with days-overdue calculation
+
+**Product polish on top of the brief:**
+- Dashboard with key-metrics stats and a status-distribution chart
+- Greeting hero with contextual insight ("X licenses need renewal")
+- Add and Edit flows in modal popups so the table stays in context
+- Inline status update via the dedicated PATCH endpoint
+- Custom SVG empty state, status badges with colored dots, initials avatars
+- Animated number count-up, top progress bar, modal entrance transitions
+- Toast notifications for every mutation
+- "Expires in N days" warning badges on active doctors with imminent expiry
+- Loading skeletons for every route segment
+- `prefers-reduced-motion` support for accessibility
 
 ---
 
-## 🏛 Architecture
+## Tech Stack
 
-Clean Architecture with four layers — dependencies point **inward only**:
+| Layer        | Technology                                                                |
+| ------------ | ------------------------------------------------------------------------- |
+| **Frontend** | Next.js 14 (App Router) · TypeScript · Tailwind CSS                       |
+|              | react-hook-form · zod · sonner (toasts) · lucide-react (icons)            |
+| **Backend**  | .NET 8 Web API · Clean Architecture · FluentValidation · Serilog          |
+| **Database** | SQL Server · Stored Procedures · EF Core 8 · Microsoft.Data.SqlClient     |
+| **Tooling**  | Swagger / OpenAPI · GitHub                                                |
+
+---
+
+## Architecture
+
+Clean Architecture with four layers — dependencies always point **inward**:
 
 ```
-┌──────────────────────────────────────────┐
-│  API   (Controllers, Middleware, DI)     │
-└─────────────┬────────────────────────────┘
-              ▼ depends on
-┌──────────────────────────────────────────┐
-│  Application  (DTOs, Services, Validators)│
-└─────────────┬────────────────────────────┘
-              ▼ depends on
-┌──────────────────────────────────────────┐
-│  Domain  (Entities, Enums, Rules)        │  ← zero dependencies
-└──────────────────────────────────────────┘
-              ▲ implements interfaces from Application
-              │
-┌──────────────────────────────────────────┐
-│  Infrastructure  (EF Core, Repositories) │
-└──────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│  API   (Controllers · Middleware · DI · Swagger · CORS)  │
+└──────────────────────┬───────────────────────────────────┘
+                       │ depends on
+┌──────────────────────▼───────────────────────────────────┐
+│  Application  (DTOs · Services · Validators · Interfaces)│
+└──────────────────────┬───────────────────────────────────┘
+                       │ depends on
+┌──────────────────────▼───────────────────────────────────┐
+│  Domain  (Entity · Enum · Exceptions)                    │  ← zero deps
+└──────────────────────────────────────────────────────────┘
+                       ▲
+                       │ implements interfaces from Application
+┌──────────────────────┴───────────────────────────────────┐
+│  Infrastructure  (EF Core DbContext · Repository)        │
+│                  (calls stored procedures via SqlQueryRaw)│
+└──────────────────────────────────────────────────────────┘
 ```
+
+### Data flow for a list request
+
+```
+Browser  →  GET /api/doctors?search=ali&status=2&pageNumber=1
+            │
+            ▼
+       DoctorsController  (API layer)
+            │
+            ▼
+       DoctorService  (Application layer — orchestration)
+            │
+            ▼
+       IDoctorRepository  (Application interface)
+            │
+            ▼  implemented by
+       DoctorRepository  (Infrastructure)
+            │
+            ▼  EF Core SqlQueryRaw with SqlParameter
+       EXEC dbo.sp_GetDoctors @Search, @StatusFilter, @PageNumber, @PageSize
+            │
+            ▼
+       SQL Server  (filters, computes Status with CASE expression, paginates)
+            │
+            ▼
+       Result rows  →  PagedResult<DoctorListItemDto>  →  JSON
+```
+
+The expiry-status logic lives **inside SQL** so the C# code never has to derive it — when a license expires, the next read returns `Status = Expired` automatically with no row update.
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 Doctor_Application/
-├── backend/         # .NET 8 Web API solution
-├── frontend/        # Next.js 14 app
-└── database/        # SQL scripts (schema + stored procedures + seed)
+├── backend/                                            .NET 8 solution
+│   ├── DoctorLicense.sln
+│   └── src/
+│       ├── DoctorLicense.Domain/                       Entities, enum, exceptions
+│       │   ├── Entities/Doctor.cs
+│       │   ├── Enums/DoctorStatus.cs
+│       │   └── Exceptions/DomainException.cs
+│       ├── DoctorLicense.Application/                  DTOs, validators, services, interfaces
+│       │   ├── DTOs/
+│       │   ├── Validators/
+│       │   ├── Interfaces/IDoctorRepository.cs
+│       │   └── Services/DoctorService.cs
+│       ├── DoctorLicense.Infrastructure/               EF Core, repository implementation
+│       │   └── Persistence/
+│       │       ├── AppDbContext.cs
+│       │       ├── Configurations/DoctorConfiguration.cs
+│       │       └── DoctorRepository.cs
+│       └── DoctorLicense.API/                          ASP.NET Core host
+│           ├── Controllers/DoctorsController.cs
+│           ├── Middleware/ExceptionMiddleware.cs
+│           ├── Program.cs
+│           └── appsettings.json
+├── database/                                           SQL scripts (idempotent, runnable in order)
+│   ├── 01_schema.sql
+│   ├── 02_sp_GetDoctors.sql
+│   ├── 03_sp_GetExpiredDoctors.sql
+│   └── 04_seed.sql
+└── frontend/                                           Next.js 14 app
+    └── src/
+        ├── app/                                        App Router pages + loading + error
+        │   └── doctors/
+        ├── components/
+        │   ├── ui/                                     Reusable primitives
+        │   └── doctors/                                Feature components
+        └── lib/
+            ├── api.ts                                  Typed fetch wrapper
+            ├── types.ts                                TS types matching backend DTOs
+            └── validators.ts                           Zod schemas mirroring FluentValidation
 ```
 
 ---
 
-## 🚀 Quick Start
-
-> _Detailed setup steps will be added as each layer is implemented._
+## Quick Start
 
 ### Prerequisites
 
-- .NET 8 SDK
-- Node.js 20+
-- SQL Server 2019+ (or LocalDB)
-- Git
+- **.NET 8 SDK** — [download](https://dotnet.microsoft.com/download/dotnet/8.0) (the project targets `net8.0`)
+- **Node.js 20+** and **npm**
+- **SQL Server 2019+** (or SQL Server Express / LocalDB)
+- **Git**
+
+### 1. Clone and install
+
+```powershell
+git clone git@github.com:AhmadAlzean99/doctor-license-management.git
+cd doctor-license-management
+```
+
+### 2. Database — run the four scripts in order
+
+```powershell
+sqlcmd -S localhost -E -i database/01_schema.sql
+sqlcmd -S localhost -E -i database/02_sp_GetDoctors.sql
+sqlcmd -S localhost -E -i database/03_sp_GetExpiredDoctors.sql
+sqlcmd -S localhost -E -i database/04_seed.sql
+```
+
+This creates `DoctorLicenseDb`, the `Doctors` table with constraints and indexes, both stored procedures, and 10 sample doctors.
+
+The scripts are **idempotent** — re-running them is safe and never produces duplicates.
+
+### 3. Backend
+
+```powershell
+cd backend/src/DoctorLicense.API
+dotnet run --launch-profile http
+```
+
+The API starts at `http://localhost:5050`. Swagger UI: `http://localhost:5050/swagger`.
+
+> **Connection string:** edit `appsettings.json` if your SQL Server uses a different server name, instance, or auth method. Default assumes Windows Authentication on `localhost`.
+
+### 4. Frontend
+
+In a new terminal:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Open `http://localhost:3000` — auto-redirects to `/doctors`.
+
+> The frontend reads `NEXT_PUBLIC_API_URL` from `frontend/.env.example`. Default is `http://localhost:5050`. Copy the file to `.env.local` if you need to override.
 
 ---
 
-## 🗄 Database
+## Database
 
-_TBD — schema and migration steps._
+The `dbo.Doctors` table:
 
-## 📦 Stored Procedures
+| Column            | Type           | Notes                                                          |
+| ----------------- | -------------- | -------------------------------------------------------------- |
+| Id                | INT IDENTITY   | Primary key, clustered                                          |
+| FullName          | NVARCHAR(150)  | Required, supports unicode                                     |
+| Email             | NVARCHAR(150)  | Required                                                       |
+| Specialization    | NVARCHAR(100)  | Required                                                       |
+| LicenseNumber     | NVARCHAR(50)   | Required, unique per active row (filtered index)               |
+| LicenseExpiryDate | DATE           | Required, no time component                                    |
+| Status            | TINYINT        | 1=Active · 2=Expired · 3=Suspended (`CHECK` constraint)        |
+| CreatedDate       | DATETIME2(0)   | Defaults to `SYSUTCDATETIME()` in UTC                          |
+| ModifiedDate      | DATETIME2(0)   | Nullable, set on update                                        |
+| IsDeleted         | BIT            | Soft-delete flag, default 0                                    |
 
-_TBD — `sp_GetDoctors` and `sp_GetExpiredDoctors`._
+**Indexes:**
+- `PK_Doctors` — clustered on Id
+- `UX_Doctors_LicenseNumber_Active` — unique on LicenseNumber **filtered to** `IsDeleted = 0`. Lets a license number be reused after the holder is soft-deleted.
+- `IX_Doctors_Status_IsDeleted` — speeds the listing SP's status filter.
+- `IX_Doctors_LicenseExpiryDate` — filtered to `IsDeleted = 0`, includes `FullName, LicenseNumber` to cover the expired-doctors SP.
 
-## 📡 API Reference
-
-_TBD — endpoints will be documented via Swagger at `/swagger`._
-
-## 🛡 Validation Strategy
-
-_TBD — defense in depth: Zod (frontend) + FluentValidation (backend) + DB constraints._
-
-## 🤔 Decisions & Trade-offs
-
-_TBD — to be filled in as the project evolves._
+**Constraints:**
+- `CHECK Status IN (1, 2, 3)` — defends the data even if the application validator is bypassed.
 
 ---
 
-## 📜 License
+## Stored Procedures
 
-Built as a technical assignment — not for production redistribution.
+### `sp_GetDoctors` — primary listing
+
+**Parameters:** `@Search`, `@StatusFilter`, `@PageNumber`, `@PageSize` (all optional with sensible defaults).
+
+**What it does:**
+1. Filters `IsDeleted = 0` and the optional search term (trimmed, applies to `FullName` OR `LicenseNumber`)
+2. Computes the **effective status** in SQL via a `CASE`:
+   - `Suspended` stays `Suspended` (administrative override wins)
+   - Otherwise: `Expired` if `LicenseExpiryDate < today`, else `Active`
+3. Applies the optional status filter against the **computed** status
+4. Returns `OFFSET / FETCH` page along with `COUNT(*) OVER()` so the row count comes in the same result set — one round trip
+5. `@PageSize` is capped at 100 server-side as a DOS guard
+
+The `CASE` result is wrapped in `CAST(... AS TINYINT)` so the byte-backed C# enum maps cleanly via EF Core's `SqlQueryRaw`.
+
+### `sp_GetExpiredDoctors` — bonus
+
+Returns every non-deleted doctor whose `LicenseExpiryDate` is in the past, sorted oldest-expiry-first, with a computed `DaysExpired` column. Suspended doctors are included if also expired — from a compliance perspective they're still expired licenses needing follow-up.
+
+Both procedures use `CREATE OR ALTER` so deployment scripts are idempotent.
+
+---
+
+## API Reference
+
+Full interactive docs at `http://localhost:5050/swagger`.
+
+| Method | Route                                | Body                  | Returns                          |
+| ------ | ------------------------------------ | --------------------- | -------------------------------- |
+| GET    | `/api/doctors`                       | (querystring)         | `PagedResult<DoctorListItemDto>` |
+| GET    | `/api/doctors/expired`               | —                     | `ExpiredDoctorDto[]`             |
+| GET    | `/api/doctors/{id}`                  | —                     | `DoctorDetailsDto`               |
+| POST   | `/api/doctors`                       | `CreateDoctorDto`     | `DoctorDetailsDto` (201 + Loc)   |
+| PUT    | `/api/doctors/{id}`                  | `UpdateDoctorDto`     | `DoctorDetailsDto`               |
+| PATCH  | `/api/doctors/{id}/status`           | `UpdateDoctorStatusDto` | (204 No Content)               |
+| DELETE | `/api/doctors/{id}`                  | —                     | (204 No Content) — soft delete   |
+
+**Error responses are a consistent JSON shape:**
+
+```json
+{ "status": 404, "title": "Not Found", "detail": "Doctor with id 999 was not found." }
+```
+
+For validation errors, an `errors` map keyed by property name is included.
+
+---
+
+## Frontend
+
+Next.js 14 App Router with Tailwind. The dashboard at `/doctors` is the single primary view.
+
+**Data flow:**
+- Server Components (`page.tsx`, `StatsBar`, `StatusDistribution`, `DashboardHero`, `DoctorTable`) fetch from the .NET API
+- Client Components (`SearchBar`, `StatusFilter`, `Pagination`, `DoctorForm`, modals) drive interactivity via `useTransition` and URL search params
+- `lib/api.ts` is the single typed fetch wrapper; `HttpError` carries the parsed error body for callers
+- `lib/validators.ts` defines Zod schemas that mirror the FluentValidation rules on the backend exactly
+
+**Routing patterns:**
+- Filters and pagination live in the URL (`/doctors?search=ali&status=2&pageNumber=2`) so the view is bookmarkable and refresh-safe.
+- Add and Edit are modal-driven for in-context UX, with `/doctors/new` and `/doctors/{id}/edit` kept as fallback pages for deep links.
+
+**Components:**
+- `components/ui/` — `Button`, `Input`, `Select`, `Badge`, `Card`, `Modal`, `Skeleton`, `Avatar`, `CountUp`, `TopProgressBar`
+- `components/doctors/` — `DashboardHero`, `StatsBar`, `StatusDistribution`, `DoctorTable`, `SearchBar`, `StatusFilter`, `Pagination`, `StatusBadge`, `DoctorForm`, `DoctorRowActions`, `DoctorStatusCard`, `AddDoctorModal`, `EditDoctorModal`, `EmptyStateIllustration`
+- `components/layout/` — `Header`
+
+---
+
+## Validation Strategy
+
+Three layers of defense, each catching what the previous one misses:
+
+| Layer            | What it catches                                                          |
+| ---------------- | ------------------------------------------------------------------------ |
+| **Frontend**     | Zod schemas in `lib/validators.ts` — instant feedback in the form, prevents the bad request |
+| **Service**      | FluentValidation in `Application/Validators/` — runs in `DoctorService.CreateAsync` and `UpdateAsync` even if validation is bypassed at the controller layer |
+| **Database**     | `CHECK` constraint on Status, filtered `UNIQUE INDEX` on LicenseNumber — the unbreakable last line |
+
+The same length limits (NVARCHAR sizes) appear in all three places. If any layer drifts the others still hold.
+
+---
+
+## Decisions and Trade-offs
+
+### Why Clean Architecture?
+The Application project has **zero dependency on EF Core or ASP.NET**. If the data store changes (Dapper, MongoDB, an HTTP service to another team), only Infrastructure changes — the service and controllers stay identical. This also makes the service easy to unit-test with a mocked `IDoctorRepository`.
+
+### Why stored procedures for reads but EF Core for writes?
+Reads benefit from the SP — the expiry CASE belongs in SQL so it's the single source of truth, and `COUNT(*) OVER()` returns total + page in one round trip. Writes don't benefit from SPs — EF Core's change tracking, `SaveChangesAsync`, and `ExecuteUpdateAsync` are cleaner than handcrafted `INSERT` / `UPDATE` procedures for one entity.
+
+### Why is Status computed in SQL instead of stored?
+Storing the computed status would require a nightly job or row-level trigger to flip `Active → Expired` when a license passes its expiry. Computing it on read means the "today's truth" is always returned with zero data drift. The stored value reflects **administrative intent** (`Active` or `Suspended`); the read returns **effective state**.
+
+### Why a filtered UNIQUE INDEX instead of a regular UNIQUE?
+A plain `UNIQUE` would block a license number from ever being reused — even after the holder is soft-deleted. The filtered index `WHERE IsDeleted = 0` enforces uniqueness only across active rows, mirroring the real-world rule that a license can have a new holder once the previous one leaves.
+
+### Why modals for Add/Edit instead of separate pages?
+Modals keep the table visible behind the form, preserving context — the admin doesn't lose their place after every edit. The `/doctors/new` and `/doctors/{id}/edit` page routes are kept as fallbacks for deep links and shareable URLs.
+
+### Why URL-driven search and filters?
+Storing filter state in the URL makes the view bookmarkable and refresh-safe, and the browser back button works naturally. It also means Server Components can read the filters directly from `searchParams` without any client-side state.
+
+### Why three exception types in Domain?
+Each one maps to a distinct HTTP status code through the global middleware: `NotFoundException → 404`, `ConflictException → 409`, `DomainException → 400`. The middleware does the translation; the service throws semantic exceptions without knowing about HTTP.
+
+### Why Sonner instead of a homemade toast?
+Three reasons: it's tiny (~1 KB), it has accessible defaults (focus management, ARIA roles), and it ships an animated entry/exit out of the box. Building those correctly takes longer than the integration.
+
+### Why a top progress bar AND `loading.tsx`?
+On localhost, navigation is so fast that `loading.tsx` skeletons flash for milliseconds and feel invisible. The progress bar guarantees a 700ms minimum visible feedback on every navigation. In production with real network latency, the skeleton becomes the dominant signal — both work together.
+
+---
+
+## What I Would Add Next
+
+These were intentionally cut from scope to keep the submission focused:
+
+- **Unit tests** for `DoctorService` (mock `IDoctorRepository`) and integration tests using `WebApplicationFactory`
+- **Authentication and role-based UI** — JWT bearer tokens, role claims for `Admin` vs `Viewer`, RBAC on the status update endpoint
+- **Audit log table** capturing who changed which field and when, surfaced in the edit modal as a timeline
+- **Sortable table columns** — backend SP already does the work; frontend just needs clickable headers
+- **CSV export** of the filtered list
+- **Multi-tenant isolation** — `TenantId` column with row-level security in SQL Server, JWT carries the tenant claim
+- **AI-assisted features** — using OpenAI to summarize a doctor's profile or flag licenses likely to expire based on history
+
+---
+
+## License
+
+Built for the Carlisle Full Stack Developer technical assignment. Not for production redistribution.
