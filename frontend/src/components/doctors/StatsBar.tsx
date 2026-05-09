@@ -9,11 +9,14 @@ interface StatProps {
   value: number;
   icon: ReactNode;
   iconGradient: string;
+  delayClass: string;
 }
 
-function Stat({ label, value, icon, iconGradient }: StatProps) {
+function Stat({ label, value, icon, iconGradient, delayClass }: StatProps) {
   return (
-    <Card className="p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+    <Card
+      className={`animate-fade-in-up p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:ring-stone-300/70 ${delayClass}`}
+    >
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-sm font-medium text-stone-500">{label}</p>
@@ -44,24 +47,28 @@ export async function StatsBar() {
         value={total.totalCount}
         icon={<Users className="h-5 w-5" />}
         iconGradient="from-teal-500 to-emerald-600 shadow-teal-600/20"
+        delayClass="[animation-delay:0ms]"
       />
       <Stat
         label="Active"
         value={active.totalCount}
         icon={<Activity className="h-5 w-5" />}
         iconGradient="from-emerald-500 to-emerald-600 shadow-emerald-600/20"
+        delayClass="[animation-delay:60ms]"
       />
       <Stat
         label="Expired"
         value={expired.totalCount}
         icon={<AlertTriangle className="h-5 w-5" />}
         iconGradient="from-rose-500 to-rose-600 shadow-rose-600/20"
+        delayClass="[animation-delay:120ms]"
       />
       <Stat
         label="Suspended"
         value={suspended.totalCount}
         icon={<ShieldOff className="h-5 w-5" />}
         iconGradient="from-amber-500 to-orange-600 shadow-amber-600/20"
+        delayClass="[animation-delay:180ms]"
       />
     </div>
   );

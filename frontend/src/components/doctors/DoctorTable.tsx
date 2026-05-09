@@ -1,7 +1,8 @@
-import { AlertTriangle, FileText } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { DoctorRowActions } from '@/components/doctors/DoctorRowActions';
+import { EmptyStateIllustration } from '@/components/doctors/EmptyStateIllustration';
 import { Pagination } from '@/components/doctors/Pagination';
 import { StatusBadge } from '@/components/doctors/StatusBadge';
 import { doctorsApi } from '@/lib/api';
@@ -36,10 +37,8 @@ export async function DoctorTable({ query }: DoctorTableProps) {
     return (
       <Card className="p-12">
         <div className="flex flex-col items-center justify-center text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-stone-100">
-            <FileText className="h-6 w-6 text-stone-400" />
-          </div>
-          <h3 className="mt-4 text-base font-semibold text-stone-900">No doctors found</h3>
+          <EmptyStateIllustration />
+          <h3 className="mt-2 text-base font-semibold text-stone-900">No doctors found</h3>
           <p className="mt-1 max-w-sm text-sm text-stone-500">
             Try adjusting your search or filters, or add a new doctor to get started.
           </p>
