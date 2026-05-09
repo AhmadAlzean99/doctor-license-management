@@ -6,24 +6,26 @@ import { DoctorStatus } from '@/lib/types';
 
 interface StatProps {
   label: string;
+  hint: string;
   value: number;
   icon: ReactNode;
   iconGradient: string;
   delayClass: string;
 }
 
-function Stat({ label, value, icon, iconGradient, delayClass }: StatProps) {
+function Stat({ label, hint, value, icon, iconGradient, delayClass }: StatProps) {
   return (
     <Card
       className={`animate-fade-in-up p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:ring-stone-300/70 ${delayClass}`}
     >
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <p className="text-sm font-medium text-stone-500">{label}</p>
-          <p className="mt-1 text-3xl font-semibold tracking-tight text-stone-900">{value}</p>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium text-stone-700">{label}</p>
+          <p className="mt-2 text-3xl font-semibold tracking-tight text-stone-900">{value}</p>
+          <p className="mt-1 text-xs text-stone-500">{hint}</p>
         </div>
         <div
-          className={`flex h-11 w-11 items-center justify-center rounded-lg bg-gradient-to-br text-white shadow-sm ${iconGradient}`}
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br text-white shadow-sm ${iconGradient}`}
         >
           {icon}
         </div>
@@ -44,6 +46,7 @@ export async function StatsBar() {
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
       <Stat
         label="Total Doctors"
+        hint="Across the platform"
         value={total.totalCount}
         icon={<Users className="h-5 w-5" />}
         iconGradient="from-teal-500 to-emerald-600 shadow-teal-600/20"
@@ -51,6 +54,7 @@ export async function StatsBar() {
       />
       <Stat
         label="Active"
+        hint="Currently practicing"
         value={active.totalCount}
         icon={<Activity className="h-5 w-5" />}
         iconGradient="from-emerald-500 to-emerald-600 shadow-emerald-600/20"
@@ -58,6 +62,7 @@ export async function StatsBar() {
       />
       <Stat
         label="Expired"
+        hint="Need renewal"
         value={expired.totalCount}
         icon={<AlertTriangle className="h-5 w-5" />}
         iconGradient="from-rose-500 to-rose-600 shadow-rose-600/20"
@@ -65,6 +70,7 @@ export async function StatsBar() {
       />
       <Stat
         label="Suspended"
+        hint="Administratively paused"
         value={suspended.totalCount}
         icon={<ShieldOff className="h-5 w-5" />}
         iconGradient="from-amber-500 to-orange-600 shadow-amber-600/20"
